@@ -42,6 +42,7 @@ fn solve1 (lines : Lines) -> i128
 fn solve2 (lines : Lines) -> i128
 {
 	let mut ret = 0;
+	let mut line_nbr = 1;
 	for line in lines
 	{
 		let mut numbers: Vec<i64> = Vec::new();
@@ -50,16 +51,23 @@ fn solve2 (lines : Lines) -> i128
 			numbers.push(n.parse::<i64>().expect("There should only be numbers in file"));
 		}
 
-		let mut incr = numbers.chunk_by(|a: &i64, b: &i64| a < b && b - a <= 3);
-		let mut decr = numbers.chunk_by(|a: &i64, b: &i64| a > b && a - b <= 3);
+		let mut incr = numbers.chunk_by(|a: &i64, b: &i64| a < b && b - a <= 3).peekable();
+		let mut decr = numbers.chunk_by(|a: &i64, b: &i64| a > b && a - b <= 3).peekable();
 
-		if decr.next().unwrap().len() == numbers.len()
-		|| incr.next().unwrap().len() == numbers.len() {
+		if decr.peek().unwrap().len() == numbers.len()
+		|| incr.peek().unwrap().len() == numbers.len() {
 			ret += 1;
 		}
 		else {
 			let incr_vec: Vec<&[i64]> = incr.collect();
 			let decr_vec: Vec<&[i64]> = decr.collect();
+
+			if incr_vec.len() == 2 {
+				println!("incr Line : {line_nbr}, {incr_vec:?}");
+			}
+			if decr_vec.len() == 2 {
+				println!("Decr Line : {line_nbr}, {decr_vec:?}");
+			}
 
 			if potential_valid(&incr_vec) {
 				ret += 1;
@@ -67,6 +75,7 @@ fn solve2 (lines : Lines) -> i128
 				ret += 1;
 			}
 		}
+		line_nbr += 1;
 	}
 	return ret;
 }
