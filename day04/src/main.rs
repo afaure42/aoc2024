@@ -1,6 +1,7 @@
 use std::ops;
 use std::fmt;
 
+// https://adventofcode.com/2024/day/4
 #[derive(Clone, Copy)]
 struct Position {
 	x: i32,

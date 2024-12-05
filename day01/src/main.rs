@@ -4,6 +4,8 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
+// https://adventofcode.com/2024/day/1
+
 fn main() {
 	let args: Vec<String> = env::args().collect();
 

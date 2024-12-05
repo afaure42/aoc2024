@@ -2,6 +2,8 @@
 use std::str::Lines;
 // use std::collections::VecDeque;
 
+// https://adventofcode.com/2024/day/2
+
 fn main() {
 	let input = include_str!("../input.txt");
 

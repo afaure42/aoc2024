@@ -1,6 +1,7 @@
 
 use regex::Regex;
 
+// https://adventofcode.com/2024/day/3
 fn main() {
 	let input = include_str!("../input.txt");
 
