@@ -138,21 +138,21 @@ fn solve2 (input : &str) -> i128
 
 		grid.push(temp);
 	}
-	let mut grid_clone = grid.clone();
+	// let mut grid_clone = grid.clone();
 	// graph traversal
 	let mut total_iters = 0;
 	println!("size :{}", grid.len() * grid[0].len());
 	for (y, row) in grid.iter().enumerate() {
 		for (x, cell) in row.iter().enumerate() {
-			if cell.content == '.'  && ! (x as i32 == pos.x && y as i32== pos.y ){
+
+			if cell.content == '.'  && ! (x as i32 == pos.x && y as i32 == pos.y ){
 				total_iters += 1;
+				let mut grid_clone = grid.clone();
 				*grid_clone.get_mut(y).unwrap().get_mut(x).unwrap() = Node {content: '#'};
 				if grid_clone[y][x].content != '#' { panic!("WTF")}
 				if is_loop(&grid_clone, pos , 0, &dirs) {
 					valid_obstacles += 1;
 				}
-				*grid_clone.get_mut(y).unwrap().get_mut(x).unwrap() = Node {content: '.'};
-				if grid_clone[y][x].content == '#' { panic!("WTF")}
 			}
 		}
 	}
@@ -164,11 +164,15 @@ fn solve2 (input : &str) -> i128
 fn advance (grid : & Vec<Vec<Node>>, pos: Point, current_dir: & mut usize, dirs: & Vec<Point>) -> Option<Point> {
 
 	let mut next_pos = pos + dirs[*current_dir];
+	if next_pos.x < 0 || next_pos.y < 0 {
+		return None
+	}
 
-	let next_node = grid.get(next_pos.y as usize)?.get(next_pos.x as usize)?;
+	let mut next_node = grid.get(next_pos.y as usize)?.get(next_pos.x as usize)?;
 
 	//if direction change is needed
-	if next_node.content == '#' {
+	let mut turns = 0;
+	while next_node.content != '.' && turns < 4 {
 		*current_dir += 1;
 		if *current_dir >= dirs.len() { *current_dir = 0;}
 
@@ -180,8 +184,8 @@ fn advance (grid : & Vec<Vec<Node>>, pos: Point, current_dir: & mut usize, dirs:
 		if next_pos.y as usize >= grid.len() || next_pos.x as usize >= grid[0].len() {
 			return None
 		}
-		//check bounds
-		// grid.get(next_pos.y as usize)?.get(next_pos.x as usize)?;
+		turns += 1;
+		next_node = grid.get(next_pos.y as usize)?.get(next_pos.x as usize)?;
 	}
 
 	Some(next_pos)
@@ -190,20 +194,11 @@ fn advance (grid : & Vec<Vec<Node>>, pos: Point, current_dir: & mut usize, dirs:
 fn is_loop(grid: &Vec<Vec<Node>>, start: Point, start_dir: usize, dirs: & Vec<Point>) -> bool {
 	
 	// let mut dir_map: HashMap<Point, u8> = HashMap::new();
-	let mut dir= start_dir;
+	let mut current_dir= start_dir;
 	let mut pos = start;
 	for _n in 1..1000000 {
 
-
-		// visit and check that we didnt visit here with this direction before
-		// if dir_map.contains_key(&pos) {
-		// 	if (dir_map[&pos] & ( 1 << dir)) != 0 {return true;}
-		// 	*dir_map.get_mut(&pos).unwrap() |= 1 << dir;
-		// } else {
-		// 	dir_map.insert(pos, 1 << dir);
-		// }
-
-		let next_pos = advance(&grid, pos, & mut dir, &dirs);
+		let next_pos = advance(&grid, pos, & mut current_dir, &dirs);
 		if next_pos.is_none() {	return false;	}
 		pos = next_pos.unwrap();		
 	}
