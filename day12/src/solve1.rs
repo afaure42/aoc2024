@@ -57,7 +57,6 @@ pub fn solve(input: &str) -> u32 {
 	let mut ret = 0;
 
 	for line in input.lines() {
-		println!("{}", line.len());
 		grid.push(line.as_bytes().to_vec());
 	}
 

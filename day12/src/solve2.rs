@@ -57,7 +57,6 @@ pub fn solve(input: &str) -> u32 {
 	let mut ret = 0;
 
 	for line in input.lines() {
-		println!("{}", line.len());
 		grid.push(line.as_bytes().to_vec());
 	}
 
@@ -65,49 +64,34 @@ pub fn solve(input: &str) -> u32 {
 		for (x, cell) in row.iter().enumerate() {
 			let p = Point {x:x as i64, y:y as i64};
 			if !visited.contains(&p) {
-
 				let (area, edges) = bfs(&grid, & mut visited, p);
 				let perimeter = calc_sides(&grid, &edges, p);
 				println!("Found area '{}' of size :{area} and perimeter:{perimeter}", *cell as char);
-				
+				ret += area * perimeter;
 			}
 		}
 	}
-	
+
 	ret
 }
 
-fn in_bounds(grid: &Vec<Vec<u8>> , p: Point) -> bool {
-	return 	!(p.y < 0
-			|| p.x < 0
-			|| p.y as usize >= grid.len()
-			|| p.x as usize >= grid[0].len());
-}
-
-fn get_value(grid: &Vec<Vec<u8>>, p: &Point) -> u8 {
-	grid[p.y as usize][p.x as usize]
-}
-
-fn is_side(grid: &Vec<Vec<u8>>, p: &Point, v: u8) -> bool {
-	!in_bounds(grid, p) || get_value(grid, p) != v
-}
-
-fn calc_sides(grid: &Vec<Vec<u8>>, edges: &HashSet<Point>, start: Point) -> i32 {
+fn calc_sides(grid: &Vec<Vec<u8>>, edges: &HashSet<Point>, start: Point) -> u32 {
 	let dirs = vec![
 		Point {x: -1, y: 0},
 		Point {x: 0, y: -1},
 		Point {x: 1, y: 0},
 		Point {x: 0, y: 1}];
-	let mut visited_sides: HashSet<Point> = HashSet::new();
-	let ret = 0;
+	let mut visited_sides: HashSet<(Point, Point)> = HashSet::new();
+	let mut ret = 0;
 	let zone = get_value(grid, &start);
 
 	for p in edges {
 		for dir in &dirs {
 			let neighbor = *p + *dir;
 			
-			if is_side(grid, &neighbor, zone) && !visited_sides.contains(&neighbor) {
+			if is_side(grid, &neighbor, zone) && !visited_sides.contains(&(*p, *dir)) {
 				mark_side(grid, & mut visited_sides, p, dir);
+				ret += 1;
 			}
 		}
 	}
@@ -115,15 +99,43 @@ fn calc_sides(grid: &Vec<Vec<u8>>, edges: &HashSet<Point>, start: Point) -> i32 
 	ret
 }
 
-fn mark_side(grid: &Vec<Vec<u8>>, visited: & mut HashSet<Point>, start: &Point, dir: &Point) {
-
+fn mark_side(grid: &Vec<Vec<u8>>, visited: & mut HashSet<(Point, Point)>, start: &Point, side_dir: &Point) {
 	// find the two perpendicular directions to explore both dir of the current side
+	let dir1: Point;
+	let dir2: Point;
+
+	if side_dir.y == 0 {
+		dir1 = Point{x:0, y: -1};
+		dir2 = Point{x:0, y: 1};
+	} else {
+		dir1 = Point{x:-1, y: 0};
+		dir2 = Point{x:1, y: 0};
+	}
+
+	let val = get_value(grid, start);
+	let mut current_point = *start;
+	//those two while loops just go each in a different direction 
+	//while the current cell is of the same zone and the side cell is still different
+	//adding to the visited sides each iteration
+	while in_bounds(grid, &current_point)
+	&& get_value(grid, &current_point) == val
+	&& is_side(grid, &(current_point + *side_dir), val) {
+		visited.insert((current_point, *side_dir));
+		current_point = current_point + dir1;
+	}
+
+	current_point = *start;
+	while in_bounds(grid, &current_point)
+	&& get_value(grid, &current_point) == val
+	&& is_side(grid, &(current_point + *side_dir), val) {
+		visited.insert((current_point, *side_dir));
+		current_point = current_point + dir2;
+	}
 }
 
-fn bfs(grid: &Vec<Vec<u8>>, visited: & mut HashSet<Point>, start: Point) -> (i32, HashSet<Point>) {
+fn bfs(grid: &Vec<Vec<u8>>, visited: & mut HashSet<Point>, start: Point) -> (u32, HashSet<Point>) {
 	let mut to_visit: VecDeque<Point> = VecDeque::new();
 	let mut area = 0;
-	let mut perimeter = 0;
 	let mut edges = HashSet::new();
 
 	let dirs = vec![
@@ -132,7 +144,7 @@ fn bfs(grid: &Vec<Vec<u8>>, visited: & mut HashSet<Point>, start: Point) -> (i32
 		Point {x: 0, y: -1},
 		Point {x: 0, y: 1}];
 
-	let start_type = grid[start.y as usize][start.x as usize];
+	let start_type = get_value(grid, &start);
 	to_visit.push_back(start);
 	visited.insert(start);
 
@@ -143,17 +155,17 @@ fn bfs(grid: &Vec<Vec<u8>>, visited: & mut HashSet<Point>, start: Point) -> (i32
 		// let current_value = grid[cell.y as usize][cell.x as usize];
 
 		area += 1;
-
+		
 		//add neighbors
 		for dir in dirs.iter() {
 			let current_neighbor = cell + *dir;
-
-			if !in_bounds(grid, current_neighbor) {
-					//hit and edge so bump perimeter
+			
+			if !in_bounds(grid, &current_neighbor) {
+					//hit and edge
 					edges.insert(cell);
 					continue;
 			}
-			let neighbor_value = grid[current_neighbor.y as usize][current_neighbor.x as usize];
+			let neighbor_value = get_value(grid, &current_neighbor);
 
 			if neighbor_value == start_type {
 				if !visited.contains(&current_neighbor) {
@@ -168,4 +180,19 @@ fn bfs(grid: &Vec<Vec<u8>>, visited: & mut HashSet<Point>, start: Point) -> (i32
 	}
 
 	(area, edges)
+}
+
+fn in_bounds(grid: &Vec<Vec<u8>> , p: &Point) -> bool {
+	return 	!(p.y < 0
+			|| p.x < 0
+			|| p.y as usize >= grid.len()
+			|| p.x as usize >= grid[0].len());
+}
+
+fn get_value(grid: &Vec<Vec<u8>>, p: &Point) -> u8 {
+	grid[p.y as usize][p.x as usize]
+}
+
+fn is_side(grid: &Vec<Vec<u8>>, p: &Point, v: u8) -> bool {
+	!in_bounds(grid, p) || get_value(grid, p) != v
 }
