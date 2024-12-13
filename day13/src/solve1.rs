@@ -1,6 +1,7 @@
 use std::fmt;
 use std::ops;
 use regex::Regex;
+use std::cmp;
 
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Default)]
 struct Point {
@@ -18,6 +19,17 @@ impl Point {
 impl fmt::Display for Point {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		write!(f, "{}, {}", self.x, self.y)
+	}
+}
+
+impl ops::Mul<i64> for Point {
+	type Output = Self;
+
+	fn mul(self, rhs: i64) -> Self {
+		Self {
+			x: self.x * rhs,
+			y: self.y * rhs,
+		}
 	}
 }
 
@@ -52,8 +64,8 @@ impl ops::Sub<Point> for Point {
 
 impl ops::SubAssign<Point> for Point {
 	fn sub_assign(&mut self, rhs: Self) {
-		self.x += rhs.x;
-		self.y += rhs.y;
+		self.x -= rhs.x;
+		self.y -= rhs.y;
 	}
 }
 
@@ -103,12 +115,34 @@ fn parse_pos(line: &str) -> Point {
 	ret
 }
 
-fn test_buttons(a: &Point, b: &Point, prize: &Point) -> (i64, i64) {
-	let (div, rem) = 
+fn test_buttons(a: &Point, b: &Point, prize: &Point) -> Option<(i64, i64)> {
+	//this is the number of times we can push button a without overshooting the prize
+	//Imagine a prize at 11, 11
+	//and a button that does 2, 3
+	// you get 11 / 2 = 5, 11 / 3 = 3
+	//you can only push the button three times without overshooting
+	//you'll be at 6, 9
+	let mut b_in_prize = cmp::max(prize.x / b.x, prize.y / b.y);
+	let mut a_in_prize = 0;
+	while b_in_prize >= 0 && a_in_prize <= 100{
+		let test = *a * a_in_prize + *b * b_in_prize;
 
+		if test == *prize {
+			return Some((a_in_prize, b_in_prize));
+		}
+
+		if test.x < prize.x && test.y < prize.y {
+			a_in_prize += 1;
+		}
+		else if test.x >= prize.x || test.y >= prize.y {
+			b_in_prize -= 1;
+		}
+	}
+
+	None
 }
 
-fn solve_machine(machine_str: &str) -> Option<i32> {
+fn solve_machine(machine_str: &str) -> Option<i64> {
 
 	let mut iter = machine_str.lines();
 
@@ -116,10 +150,15 @@ fn solve_machine(machine_str: &str) -> Option<i32> {
 	let button_b = parse_pos(iter.next().unwrap());
 	let prize = parse_pos(iter.next().unwrap());
 
-	println!("{button_a}");
-	println!("{button_b}");
-	println!("{prize}");
+	// println!("{button_a}");
+	// println!("{button_b}");
+	// println!("{prize}");
 
-
-	Some(0)
+	if let Some(ab) = test_buttons(&button_a, &button_b, &prize){
+		// println!("Found :{:?}", ab);
+		return Some(ab.0 * 3 + ab.1);
+	} else {
+		// println!("NO SOLUTION");
+	}
+	None
 }

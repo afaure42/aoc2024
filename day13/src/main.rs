@@ -2,7 +2,7 @@ mod solve1;
 mod solve2;
 
 fn main() {
-	let input = include_str!("../input_bis.txt");
+	let input = include_str!("../input.txt");
 
 
 	println!("RET1: {}", solve1::solve(input));
