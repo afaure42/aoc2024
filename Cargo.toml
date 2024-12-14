@@ -1,0 +1,68 @@
+[package]
+name = "aoc2024"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+regex = "1.11.1"
+
+
+[[bin]]
+name = "day01"
+path = "src//main.rs"
+
+[[bin]] 
+name = "day02"
+path = "src/day02/main.rs"
+
+[[bin]] 
+name = "day03"
+path = "src/day03/main.rs"
+
+[[bin]] 
+name = "day04"
+path = "src/day04/main.rs"
+
+[[bin]] 
+name = "day05"
+path = "src/day05/main.rs"
+
+[[bin]] 
+name = "day06"
+path = "src/day06/main.rs"
+
+[[bin]] 
+name = "day07"
+path = "src/day07/main.rs"
+
+[[bin]] 
+name = "day08"
+path = "src/day08/main.rs"
+
+[[bin]] 
+name = "day09"
+path = "src/day09/main.rs"
+
+[[bin]] 
+name = "day10"
+path = "src/day10/main.rs"
+
+[[bin]] 
+name = "day11"
+path = "src/day11/main.rs"
+
+[[bin]] 
+name = "day12"
+path = "src/day12/main.rs"
+
+[[bin]] 
+name = "day13"
+path = "src/day13/main.rs"
+
+[[bin]] 
+name = "day14"
+path = "src/day14/main.rs"
+
+[[bin]] 
+name = "day15"
+path = "src/day15/main.rs"
