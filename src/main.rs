@@ -1,6 +1,6 @@
 
 mod utils;
-use utils::Point;
+use utils::math;
 
 fn main() {
 	

@@ -1,9 +1,11 @@
 use std::fmt;
 use std::ops;
-use std::path::Display;
 use std::str::FromStr;
 
-#[derive(Clone, Copy, Hash, PartialEq, Eq, Default)]
+#[cfg(test)]
+mod tests;
+
+#[derive(Clone, Copy, Hash, PartialEq, Eq, Default, Debug)]
 struct Vec2<T>
 {
 	x: T,
@@ -48,13 +50,13 @@ where
 
 impl<T> ops::Mul<T> for Vec2<T> 
 where
-	T: ops::Mul<Output = T> + Clone
+	T: ops::Mul<Output = T> + Copy
 {
 	type Output = Self;
 
 	fn mul(self, rhs: T) -> Self {
 		Self {
-			x: self.x * rhs.clone(),
+			x: self.x * rhs,
 			y: self.y * rhs,
 		}
 	}
