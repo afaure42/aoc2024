@@ -1,26 +1,43 @@
 use std::fmt;
 use std::ops;
 use std::str::FromStr;
+use std::convert::From;
 
 #[cfg(test)]
 mod tests;
 
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Default, Debug)]
-struct Vec2<T>
+pub struct Vec2<T>
 {
-	x: T,
-	y: T,
+	pub x: T,
+	pub y: T,
 }
 
 impl<T> Vec2<T> {
-	fn new(x: T, y: T) -> Vec2<T> {
+	pub fn new(x: T, y: T) -> Vec2<T> {
 		Vec2 {x, y}
 	}
 
 }
 
+pub trait Convert<T>: Sized {
+	fn convert(value:T) -> Self;
+}
+
+impl<T, U> Convert<Vec2<T>> for Vec2<U>
+where
+	U: From<T>
+ {
+	fn convert(value:Vec2<T>) -> Self {
+		Vec2 {
+			x: U::from(value.x),
+			y: U::from(value.y)
+		}
+	}
+}
+
 #[derive(Debug, PartialEq, Eq)]
-struct ParseVec2Error;
+pub struct ParseVec2Error;
 
 impl<T> FromStr for Vec2<T> 
 where

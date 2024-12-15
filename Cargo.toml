@@ -8,6 +8,9 @@ cached = "0.54.0"
 nalgebra = "0.33.2"
 regex = "1.11.1"
 
+[lib]
+name = "lib"
+path = "src/lib.rs"
 
 [[bin]]
 name = "day01"
