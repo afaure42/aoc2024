@@ -1,7 +1,7 @@
 use std::fmt;
 use std::ops;
 use std::str::FromStr;
-use std::convert::From;
+// use std::convert::From;
 
 #[cfg(test)]
 mod tests;
