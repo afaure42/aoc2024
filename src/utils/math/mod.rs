@@ -20,19 +20,23 @@ impl<T> Vec2<T> {
 
 }
 
+#[derive(Debug)]
+pub struct ConvertVec2Error;
+
 pub trait Convert<T>: Sized {
-	fn convert(value:T) -> Self;
+	fn convert(value:T) -> Result<Self, ConvertVec2Error>;
 }
+
 
 impl<T, U> Convert<Vec2<T>> for Vec2<U>
 where
-	U: From<T>
+	U: TryFrom<T>
  {
-	fn convert(value:Vec2<T>) -> Self {
-		Vec2 {
-			x: U::from(value.x),
-			y: U::from(value.y)
-		}
+	fn convert(value:Vec2<T>) -> Result<Self, ConvertVec2Error> {
+		Ok(Vec2 {
+			x: U::try_from(value.x).map_err(|_| ConvertVec2Error)?,
+			y: U::try_from(value.y).map_err(|_| ConvertVec2Error)?
+		})
 	}
 }
 
