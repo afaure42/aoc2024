@@ -101,3 +101,8 @@ tes = false
 name = "day18"
 path = "src/day18/main.rs"
 tes = false
+
+[[bin]] 
+name = "day19"
+path = "src/day19/main.rs"
+tes = false
