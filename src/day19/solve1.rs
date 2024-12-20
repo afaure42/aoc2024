@@ -27,7 +27,7 @@ fn recurse(solution: String, target: &str, towels: &[&str]) -> bool {
 
 		if test_solution.len() > target.len() {continue} 
 		if test_solution == target {return true}
-		if test_solution != target.split_at(test_solution.len()).0 {continue;}
+		if !target.starts_with(&test_solution) {continue;}
 
 		if recurse(test_solution, target, towels) {
 			return true

@@ -37,7 +37,7 @@ fn recurse(solution: String, target: &str, towels: &[&str]) -> u128 {
 			ret += 1
 		}
 		if test_solution.len() >= target.len() {continue} 
-		if test_solution != target.split_at(test_solution.len()).0 {continue;}
+		if !target.starts_with(&test_solution) {continue;}
 
 		ret += recurse(test_solution, target, towels)
 	}
