@@ -6,7 +6,7 @@ use std::str::FromStr;
 #[cfg(test)]
 mod tests;
 
-#[derive(Clone, Copy, Hash, PartialEq, Eq, Default, Debug)]
+#[derive(Clone, Copy, Hash, PartialEq, Eq, Default, Debug, PartialOrd, Ord)]
 pub struct Vec2<T>
 {
 	pub x: T,
